@@ -11,6 +11,8 @@ import StreamPage from "./pages/StreamPage";
 import Navbar from "./components/NavBar";
 import StudentProfile from "./pages/StudentProfile";
 import FocusDetection from './pages/FocusDetection';
+import CameraPreview from "./pages/CameraPreview";
+
 function App() {
   return (
     <Router>
@@ -26,7 +28,7 @@ function App() {
         <Route path="/classroom/:classroomId" element={<StreamPage />} />
         <Route path="/profile" element={<StudentProfile />} />
         <Route path="/student/focus" element={<FocusDetection />} />
-
+        <Route path="/camera-preview/:classroomId" element={<CameraPreview />} />
       </Routes>
     </Router>
   );

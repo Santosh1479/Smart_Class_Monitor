@@ -11,17 +11,11 @@ export default function TeacherHome() {
   const name = localStorage.getItem("name");
   const teacherId = localStorage.getItem("userId");
   const [classrooms, setClassrooms] = useState([]);
-  const [selectedClassroom, setSelectedClassroom] = useState(null);
-  const [showAddStudentModal, setShowAddStudentModal] = useState(false);
-  const [studentEmail, setStudentEmail] = useState("");
   const [streamTitle, setStreamTitle] = useState("");
   const [streamLink, setStreamLink] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [showStreamModal, setShowStreamModal] = useState(false);
   const [newClassroom, setNewClassroom] = useState({ name: "", subject: "" });
-  const [showAttendancePopup, setShowAttendancePopup] = useState(false);
-  const [attendanceClass, setAttendanceClass] = useState(null);
-  const [attendanceDate, setAttendanceDate] = useState("");
 
   // Fetch classrooms created by the teacher
   useEffect(() => {
@@ -87,27 +81,6 @@ export default function TeacherHome() {
 
   const handleStopStream = () => {
     socket.emit("stopStream", selectedClassroom._id); // Notify students
-  };
-
-  const handleAddStudent = async () => {
-    if (!studentEmail) {
-      alert("Please enter a valid email.");
-      return;
-    }
-    try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/classrooms/${
-          selectedClassroom._id
-        }/add-student`,
-        { email: studentEmail }
-      );
-      alert("Student added successfully!");
-      setShowAddStudentModal(false);
-      setStudentEmail("");
-    } catch (err) {
-      console.error("Error adding student:", err);
-      alert(err.response?.data?.message || "Failed to add student");
-    }
   };
 
   return (
@@ -186,24 +159,9 @@ export default function TeacherHome() {
               {classrooms.map((classroom) => (
                 <div
                   key={classroom._id}
-                  className="p-4 bg-gray-100 rounded-lg shadow-md relative"
-                  onClick={() => {
-                    setSelectedClassroom(classroom);
-                    setShowStreamModal(true);
-                  }}
+                  onClick={() => navigate(`/camera-preview/${classroom._id}`)}
+                  className="cursor-pointer p-4 bg-gray-100 rounded-lg shadow-md relative"
                 >
-                  <div className="absolute top-2 right-2">
-                    <button
-                      onClick={() => {
-                        setSelectedClassroom(classroom);
-                        setShowAddStudentModal(true); // Open Add Student Modal
-                      }}
-                      className="bg-green-600 text-2xl items-center text-black px-2 py-1 rounded-full hover:bg-green-700 transition"
-                      title="Add Student"
-                    >
-                      +
-                    </button>
-                  </div>
                   <h3 className="text-lg font-bold text-black">
                     {classroom.name}
                   </h3>
@@ -275,39 +233,6 @@ export default function TeacherHome() {
                 </a>
               </p>
             )}
-          </div>
-        </div>
-      )}
-
-      {/* Add Student Modal */}
-      {showAddStudentModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-          <div className="bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl p-6 rounded-2xl w-full max-w-md text-white">
-            <h3 className="text-xl font-bold mb-4 text-center drop-shadow-lg">
-              Add Student
-            </h3>
-            <input
-              type="email"
-              placeholder="Enter student email"
-              value={studentEmail}
-              onChange={(e) => setStudentEmail(e.target.value)}
-              className="w-full px-4 py-2 bg-white/20 border border-white/30 rounded-lg placeholder-gray-200 text-white focus:outline-none focus:ring-2 focus:ring-violet-400 mb-4"
-              required
-            />
-            <div className="flex justify-end gap-4">
-              <button
-                onClick={handleAddStudent}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
-              >
-                Add
-              </button>
-              <button
-                onClick={() => setShowAddStudentModal(false)}
-                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
-              >
-                Cancel
-              </button>
-            </div>
           </div>
         </div>
       )}
