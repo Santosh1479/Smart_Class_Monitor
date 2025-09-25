@@ -11,10 +11,7 @@ export default function TeacherHome() {
   const name = localStorage.getItem("name");
   const teacherId = localStorage.getItem("userId");
   const [classrooms, setClassrooms] = useState([]);
-  const [streamTitle, setStreamTitle] = useState("");
-  const [streamLink, setStreamLink] = useState("");
   const [showForm, setShowForm] = useState(false);
-  const [showStreamModal, setShowStreamModal] = useState(false);
   const [newClassroom, setNewClassroom] = useState({ name: "", subject: "" });
 
   // Fetch classrooms created by the teacher
@@ -57,30 +54,6 @@ export default function TeacherHome() {
     localStorage.removeItem("role");
     alert("Logged out successfully!");
     navigate("/teacher-login");
-  };
-
-  const handleGenerateLink = () => {
-    if (!streamTitle) {
-      alert("Please enter a stream title.");
-      return;
-    }
-    const generatedLink = `${window.location.origin}/stream/${
-      selectedClassroom._id
-    }?title=${encodeURIComponent(streamTitle)}`;
-    setStreamLink(generatedLink);
-  };
-
-  const handleStartStream = () => {
-    if (!streamTitle) {
-      alert("Please enter a stream title.");
-      return;
-    }
-    navigate(`/classroom/${selectedClassroom._id}`, { state: { streamTitle } }); // Ensure this matches the route in App.jsx
-    socket.emit("startStream", selectedClassroom._id); // Notify students
-  };
-
-  const handleStopStream = () => {
-    socket.emit("stopStream", selectedClassroom._id); // Notify students
   };
 
   return (
@@ -159,7 +132,7 @@ export default function TeacherHome() {
               {classrooms.map((classroom) => (
                 <div
                   key={classroom._id}
-                  onClick={() => navigate(`/camera-preview/${classroom._id}`)}
+                  onClick={() => navigate(`/camera-preview/${classroom.name}/${classroom._id}`)}
                   className="cursor-pointer p-4 bg-gray-100 rounded-lg shadow-md relative"
                 >
                   <h3 className="text-lg font-bold text-black">
@@ -167,9 +140,6 @@ export default function TeacherHome() {
                   </h3>
                   <p className="text-sm text-gray-900">
                     Subject: {classroom.subject}
-                  </p>
-                  <p className="text-sm text-gray-900">
-                    Students: {classroom.students?.length || 0}
                   </p>
                 </div>
               ))}
@@ -179,63 +149,6 @@ export default function TeacherHome() {
           )}
         </div>
       </div>
-
-      {showStreamModal && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
-          onClick={() => setShowStreamModal(false)}
-        >
-          <div
-            className="bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl p-6 rounded-2xl w-full max-w-md text-white"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-xl font-bold mb-4 text-center drop-shadow-lg">
-              Start Stream
-            </h3>
-            <input
-              type="text"
-              placeholder="Enter Stream Title"
-              value={streamTitle}
-              onChange={(e) => setStreamTitle(e.target.value)}
-              className="w-full px-4 py-2 bg-white/20 border border-white/30 rounded-lg placeholder-gray-200 text-white focus:outline-none focus:ring-2 focus:ring-violet-400 mb-4"
-              required
-            />
-            <div className="flex justify-between gap-4">
-              <button
-                onClick={handleGenerateLink}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-              >
-                Generate Link
-              </button>
-              <button
-                onClick={handleStartStream}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
-              >
-                Start Stream
-              </button>
-              <button
-                onClick={() => setShowStreamModal(false)}
-                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
-              >
-                Cancel
-              </button>
-            </div>
-            {streamLink && (
-              <p className="mt-4 text-sm text-gray-300">
-                Stream Link:{" "}
-                <a
-                  href={streamLink}
-                  className="text-violet-400 hover:underline"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {streamLink}
-                </a>
-              </p>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

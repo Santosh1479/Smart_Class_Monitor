@@ -29,6 +29,7 @@ function App() {
         <Route path="/profile" element={<StudentProfile />} />
         <Route path="/student/focus" element={<FocusDetection />} />
         <Route path="/camera-preview/:classroomId" element={<CameraPreview />} />
+        <Route path="/camera-preview/:className/:_id" element={<CameraPreview />} />
       </Routes>
     </Router>
   );
