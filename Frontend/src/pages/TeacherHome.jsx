@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { io } from "socket.io-client";
-import { FaDownload } from "react-icons/fa"; // For download icon
-
-const socket = io(`${import.meta.env.VITE_SOCKET_URL}`);
 
 export default function TeacherHome() {
   const navigate = useNavigate();

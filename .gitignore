@@ -1,3 +1,4 @@
 node_modules
 .env
-Py_Recognizer
+Py_Recognizer/dataset
+Py_Recognizer/models

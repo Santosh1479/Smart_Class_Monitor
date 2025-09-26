@@ -23,7 +23,7 @@ export default function Navbar() {
       <div className="flex justify-between items-center max-w-screen-xl mx-auto">
         {/* Logo */}
         <Link className="text-xl font-bold text-white" to="/">
-          Smart_edu
+          EDU_Scope
         </Link>
 
         {/* Desktop Navbar */}
