@@ -1,11 +1,9 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import React, { useState } from 'react';
-import SidebarLinks from './SidebarLinks'; // Create this component for sidebar links
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { isLoggedIn, logout, user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -28,7 +26,33 @@ export default function Navbar() {
 
         {/* Desktop Navbar */}
         <div className="hidden sm:flex space-x-6 items-center">
-          {isLoggedIn ? (
+          {!isLoggedIn ? (
+            <Link
+              to="/login"
+              className="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-full text-white"
+            >
+              Login
+            </Link>
+          ) : user?.role === "teacher" ? (
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-full text-white"
+            >
+              Logout
+            </button>
+          ) : user?.role === "student" ? (
+            <>
+              <Link to="/profile" className="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-full text-white">Profile</Link>
+              <Link to="/analytics" className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 rounded-full text-white">Analytics</Link>
+              <Link to="/focus" className="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-full text-white">Focus</Link>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-full text-white"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
             <>
               <Link to="/profile">
                 <img
@@ -43,21 +67,6 @@ export default function Navbar() {
               >
                 Logout
               </button>
-            </>
-          ) : (
-            <>
-              <Link
-                to="/login"
-                className="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-full text-white"
-              >
-                Login
-              </Link>
-              <Link
-                to="/register"
-                className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-black rounded-full"
-              >
-                Register
-              </Link>
             </>
           )}
         </div>
@@ -74,7 +83,54 @@ export default function Navbar() {
                 onClick={() => setIsOpen(false)}
               />
               <div className="relative bg-white w-64 h-full shadow-xl flex flex-col p-6 mt-20 animate-slide-in-right rounded-lg">
-                <SidebarLinks onNavigate={() => setIsOpen(false)} />
+                {/* Only show login if not logged in */}
+                {!isLoggedIn ? (
+                  <Link
+                    to="/login"
+                    className="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-full text-white mb-4"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Login
+                  </Link>
+                ) : user?.role === "teacher" ? (
+                  <button
+                    onClick={handleLogout}
+                    className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-full text-white mb-4"
+                  >
+                    Logout
+                  </button>
+                
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    <Link
+                      to="/profile"
+                      className="px-4 py-2 text-black size-2 mb-4"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Profile
+                    </Link>
+                    <Link
+                      to="/analytics"
+                      className="px-4 py-2 text-black size-2 mb-4"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Analytics
+                    </Link>
+                    <Link
+                      to="/focus"
+                      className="px-4 py-2 text-black size-2 mb-4"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Focus
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="px-4 py-2 rounded-full text-red-500 mb-4 absolute left-6 top-36"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}

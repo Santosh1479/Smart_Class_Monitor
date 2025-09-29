@@ -19,7 +19,7 @@ const Start = () => {
 
         {/* Info Section */}
         <div className="w-full sm:w-1/2 p-4 text-center flex flex-col items-center">
-          <h1 className="text-2xl sm:text-4xl font-semibold mb-4">Welcome to EDU_Scope</h1>
+          <h1 className="text-2xl sm:text-4xl font-semibold mb-4">Welcomes you to EDU_Scope</h1>
           {/* <p>(Education+Observation,Monitoring,Insight)</p> */}
           <div
             

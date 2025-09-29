@@ -36,10 +36,9 @@ export default function TeacherHome() {
       setClassrooms([...classrooms, res.data]);
       setNewClassroom({ name: "", subject: "" });
       setShowForm(false);
-      alert("Classroom created successfully!");
     } catch (err) {
       console.error("Error creating classroom:", err);
-      alert(err.response?.data?.message || "Failed to create classroom");
+      console.err(err.response?.data?.message || "Failed to create classroom");
     }
   };
 
@@ -48,7 +47,6 @@ export default function TeacherHome() {
     localStorage.removeItem("id");
     localStorage.removeItem("name");
     localStorage.removeItem("role");
-    alert("Logged out successfully!");
     navigate("/teacher-login");
   };
 

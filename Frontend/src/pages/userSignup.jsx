@@ -31,10 +31,9 @@ export default function UserSignup() {
       localStorage.setItem("role", "student");
       localStorage.setItem("branch", branch);
       localStorage.setItem("semester", semester);
-      alert("Registered successfully!");
       navigate("/profile");
     } catch (err) {
-      alert(err.response?.data?.message || "Registration failed");
+      console.err(err.response?.data?.message || "Registration failed");
     }
   };
 

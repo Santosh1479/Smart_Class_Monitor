@@ -16,10 +16,9 @@ export default function TeacherSignup() {
       localStorage.setItem("id", res.data.teacher._id);
       localStorage.setItem("name", res.data.teacher.name);
       localStorage.setItem("role", "teacher");
-      alert("Teacher registered successfully!");
       navigate("/teacher-home");
     } catch (err) {
-      alert(err.response?.data?.message || "Signup failed");
+      console.err(err.response?.data?.message || "Signup failed");
     }
   };
 

@@ -31,10 +31,9 @@ export default function TeacherLogin() {
 
       login(); // Let context pull from localStorage
 
-      alert("Teacher logged in successfully!");
       navigate("/teacher-home");
     } catch (err) {
-      alert(err.response?.data?.message || "Login failed");
+      console.log(err.response?.data?.message || "Login failed");
     }
   };
 
