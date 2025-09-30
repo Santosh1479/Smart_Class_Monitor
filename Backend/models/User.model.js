@@ -9,8 +9,11 @@ const userSchema = new mongoose.Schema({
   usn: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  branch: { type: String, required: true },
-  semester: { type: Number, required: true },
+  attendance: {
+    type: Map,
+    of: [String], // Array of "p" or "a"
+    default: {}
+  }
 });
 
 

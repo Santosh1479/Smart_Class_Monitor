@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { MoreVertical } from "lucide-react"; // or use any icon
 
 export default function TeacherHome() {
   const navigate = useNavigate();
@@ -9,6 +10,8 @@ export default function TeacherHome() {
   const [classrooms, setClassrooms] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [newClassroom, setNewClassroom] = useState({ name: "", subject: "" });
+  const [menuOpen, setMenuOpen] = useState(null);
+  const [toast, setToast] = useState("");
 
   // Fetch classrooms created by the teacher
   useEffect(() => {
@@ -52,6 +55,12 @@ export default function TeacherHome() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#1d0036] to-[#6A29FF] text-white">
+      {/* Toast notification */}
+      {toast && (
+        <div className="fixed top-6 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-2 rounded shadow-lg z-50">
+          {toast}
+        </div>
+      )}
       {/* Header Section */}
       <div className="bg-white/10 backdrop-blur-lg border border-white/20 shadow-md p-4 flex justify-between items-center">
         <h1 className="text-2xl font-bold drop-shadow-lg">Welcome, {name}!</h1>
@@ -126,9 +135,59 @@ export default function TeacherHome() {
               {classrooms.map((classroom) => (
                 <div
                   key={classroom._id}
-                  onClick={() => navigate(`/camera-preview/${classroom.name}/${classroom._id}`)}
+                  onClick={() =>
+                    navigate(
+                      `/camera-preview/${classroom.name}/${classroom._id}`
+                    )
+                  }
                   className="cursor-pointer p-4 bg-gray-100 rounded-lg shadow-md relative"
                 >
+                  <div className="relative">
+                    <div
+                      className="absolute top-2 right-2 cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMenuOpen(classroom._id);
+                      }}
+                    >
+                      <MoreVertical size={24} color="#333" />
+                    </div>
+                    {menuOpen === classroom._id && (
+                      <div
+                        className="absolute top-8 right-2 bg-white rounded shadow-lg z-10"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <button
+                          className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            // 1. Get all students of this class
+                            const res = await axios.get(
+                              `${import.meta.env.VITE_PY_API_URL}/class/${
+                                classroom.name
+                              }`
+                            );
+                            const students = res.data.students || [];
+                            // 2. Hit holiday API
+                            await axios.post(
+                              `${
+                                import.meta.env.VITE_BASE_URL
+                              }/users/attendance-holiday`,
+                              {
+                                subject: classroom.name,
+                                students,
+                              }
+                            );
+                            setMenuOpen(null);
+                            setToast("Marked holiday for today");
+                            setTimeout(() => setToast(""), 2000);
+                          }}
+                        >
+                          Put Holiday
+                        </button>
+                      </div>
+                    )}
+                  </div>
                   <h3 className="text-lg font-bold text-black">
                     {classroom.name}
                   </h3>

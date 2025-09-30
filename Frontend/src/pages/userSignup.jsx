@@ -4,36 +4,31 @@ import axios from "axios";
 
 export default function UserSignup() {
   const navigate = useNavigate();
-  const [name, setName] = useState("test1");
-  const [usn, setUsn] = useState("TEST1");
-  const [email, setEmail] = useState("test1@test.com");
+  const [name, setName] = useState("test");
+  const [usn, setUsn] = useState("EC45");
+  const [email, setEmail] = useState("test@test.com");
   const [password, setPassword] = useState("testpass");
-  const [branch, setBranch] = useState("Computer Science");
-  const [semester, setSemester] = useState("6");
 
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`
-        ${import.meta.env.VITE_BASE_URL}/users/register`,
+      const res = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/users/register`,
         {
           name,
+          usn,
           email,
           password,
-          usn,
-          branch,
-          semester,
         }
       );
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userId", res.data.user._id);
       localStorage.setItem("name", res.data.user.name);
       localStorage.setItem("role", "student");
-      localStorage.setItem("branch", branch);
-      localStorage.setItem("semester", semester);
+      localStorage.setItem("usn", usn);
       navigate("/profile");
     } catch (err) {
-      console.err(err.response?.data?.message || "Registration failed");
+      alert(err.response?.data?.message || "Registration failed");
     }
   };
 
@@ -83,38 +78,6 @@ export default function UserSignup() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-
-          <select
-            className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-400"
-            value={branch}
-            onChange={(e) => setBranch(e.target.value)}
-            required
-          >
-            <option value="" disabled>
-              Select Branch
-            </option>
-            <option value="CSE">CSE</option>
-            <option value="ISE">ISE</option>
-            <option value="ECE">ECE</option>
-            <option value="MECH">MECH</option>
-            <option value="CIVIL">CIVIL</option>
-          </select>
-
-          <select
-            className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-green-400"
-            value={semester}
-            onChange={(e) => setSemester(e.target.value)}
-            required
-          >
-            <option value="" disabled>
-              Select Semester
-            </option>
-            {[...Array(8)].map((_, i) => (
-              <option key={i + 1} value={i + 1}>
-                Semester {i + 1}
-              </option>
-            ))}
-          </select>
 
           <button
             className="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-semibold transition duration-300 shadow-lg"

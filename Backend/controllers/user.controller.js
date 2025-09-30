@@ -6,9 +6,9 @@ const bcrypt = require('bcrypt');
 
 module.exports.registerUser = async (req, res) => {
     try {
-        const { name, email, password, usn, branch, semester } = req.body;
+        const { name, email, password, usn } = req.body;
 
-        if (!name || !email || !password || !usn || !branch || !semester) {
+        if (!name || !email || !password || !usn) {
             return res.status(400).json({ message: "All fields are required" });
         }
 
@@ -25,8 +25,6 @@ module.exports.registerUser = async (req, res) => {
             email,
             password: hashedPassword, // Save the hashed password
             usn,
-            branch,
-            semester,
         });
 
         // Generate a JWT token

@@ -57,15 +57,32 @@ def gaze_status(landmarks, left_eye_indices, right_eye_indices):
         return "Looking Forward"
 
 # --- Load model for class ---
+import os
+
 @app.route("/class/<class_name>", methods=["GET"])
 def load_class_model(class_name):
     global loaded_model, current_class
     model_path = f"{MODEL_DIR}/{class_name}_model.pkl"
+    dataset_path = os.path.join(os.path.dirname(__file__), "dataset", class_name)
     try:
         with open(model_path, "rb") as f:
             loaded_model = pickle.load(f)
         current_class = class_name
-        return jsonify({"status": "success", "message": f"Loaded model for {class_name}"})
+
+        # Get all student folder names (USNs)
+        if os.path.exists(dataset_path):
+            students = [
+                name for name in os.listdir(dataset_path)
+                if os.path.isdir(os.path.join(dataset_path, name))
+            ]
+        else:
+            students = []
+
+        return jsonify({
+            "status": "success",
+            "message": f"Loaded model for {class_name}",
+            "students": students  # <-- Add this!
+        })
     except FileNotFoundError:
         return jsonify({"error": f"Model for class '{class_name}' not found"}), 404
 

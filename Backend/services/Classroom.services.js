@@ -29,57 +29,6 @@ exports.getClassroomsByTeacherId = async (teacherId) => {
   }
 };
 
-// Get classrooms by student ID
-exports.getClassroomsByStudentId = async (studentId) => {
-  try {
-    const classrooms = await Classroom.find({ students: studentId }).populate("teacher");
-    return classrooms;
-  } catch (err) {
-    console.error("Error fetching classrooms by student ID:", err);
-    throw new Error("Failed to fetch classrooms");
-  }
-};
-
-// Start a stream for a classroom
-exports.startStream = async (classroomId, streamUrl) => {
-  try {
-    const classroom = await Classroom.findByIdAndUpdate(
-      classroomId,
-      { streamUrl },
-      { new: true }
-    );
-    if (!classroom) {
-      throw new Error("Classroom not found");
-    }
-    return classroom;
-  } catch (err) {
-    console.error("Error starting stream:", err);
-    throw new Error("Failed to start stream");
-  }
-};
-
-// Add a student to a classroom
-exports.addStudent = async (classroomId, studentId) => {
-  try {
-    const classroom = await Classroom.findById(classroomId);
-    if (!classroom) {
-      throw new Error("Classroom not found");
-    }
-
-    // Check if the student is already in the classroom
-    if (classroom.students.includes(studentId)) {
-      throw new Error("Student is already in the classroom");
-    }
-
-    classroom.students.push(studentId);
-    await classroom.save();
-    return classroom;
-  } catch (err) {
-    console.error("Error adding student to classroom:", err);
-    throw new Error("Failed to add student to classroom");
-  }
-};
-
 // Get attendance CSV for a classroom
 exports.getAttendanceCSV = async (classroomId) => {
   const classroom = await Classroom.findById(classroomId).lean();

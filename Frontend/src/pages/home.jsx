@@ -11,8 +11,6 @@ const Home = () => {
     localStorage.removeItem("name");
     localStorage.removeItem("role");
     localStorage.removeItem("branch");
-    localStorage.removeItem("semester");
-    localStorage.removeItem("user");
     navigate("/login");
   };
 

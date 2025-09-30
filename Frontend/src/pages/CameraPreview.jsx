@@ -9,6 +9,7 @@ export default function CameraPreview() {
   const [recentPredictions, setRecentPredictions] = useState([]);
   const [studentCredits, setStudentCredits] = React.useState({});
   const [presentStudents, setPresentStudents] = React.useState([]);
+  const [allStudents, setAllStudents] = useState([]);
   const { className, _id } = useParams();
   const navigate = useNavigate();
 
@@ -18,7 +19,8 @@ export default function CameraPreview() {
 
     async function init() {
       try {
-        await axios.get(`${import.meta.env.VITE_PY_API_URL}/class/${className}`);
+        const res = await axios.get(`${import.meta.env.VITE_PY_API_URL}/class/${className}`);
+        setAllStudents(res.data.students || []);
 
         stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
         if (videoRef.current) {
@@ -115,19 +117,40 @@ export default function CameraPreview() {
   }
 
   function handleEndClass() {
-    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-    const filename = `${className}_${dateStr}.xlsx`;
-
-    const data = presentStudents.map(id => ({
-      Student: id,
-      Credits: studentCredits[id] || 0
+    const subject = className;
+    // Present students
+    const attendanceData = presentStudents.map(usn => ({
+      USN: usn,
+      Status: "p"
     }));
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Credits");
-    XLSX.writeFile(wb, filename); // This will save to user's Downloads folder
+    // Absentees
+    const absentees = allStudents.filter(usn => !presentStudents.includes(usn));
 
-    navigate("/teacher-home");
+    // 1. Mark present students
+    axios.post(
+      `${import.meta.env.VITE_BASE_URL}/users/attendance-upload`,
+      { subject, attendance: attendanceData }
+    ).then(() => {
+      // 2. Mark absentees
+      if (absentees.length > 0) {
+        axios.post(
+          `${import.meta.env.VITE_BASE_URL}/users/attendance-absent`,
+          { subject, absentees }
+        ).then(() => {
+          exportCredits();
+          navigate("/teacher-home");
+        }).catch(() => {
+          alert("Failed to mark absentees.");
+          navigate("/teacher-home");
+        });
+      } else {
+        exportCredits();
+        navigate("/teacher-home");
+      }
+    }).catch(() => {
+      alert("Failed to upload attendance.");
+      navigate("/teacher-home");
+    });
   }
 
   return (
