@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import Sidebar from "../components/Sidebar";
-import { Menu, MoreVertical } from "lucide-react"; // Add this import
+import { Bot } from "lucide-react"; // Add this import
 import gsap from "gsap";
 
 export default function ProfilePage() {
   const { user } = useAuth();
   const [streakData, setStreakData] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatInput, setChatInput] = useState("");
+  const [chatMessages, setChatMessages] = useState([]);
   const profileRef = useRef(null);
   const streakRef = useRef(null);
 
@@ -48,6 +51,36 @@ export default function ProfilePage() {
       );
     }
   }, [streakData]);
+
+  async function sendMessage() {
+    if (!chatInput.trim()) return;
+    const userMsg = { sender: "student", text: chatInput };
+    setChatMessages((prev) => [...prev, userMsg]);
+    setChatInput("");
+
+    try {
+      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/api/gemini-chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: userMsg.text })
+      });
+      const data = await res.json();
+      const botMsg = {
+        sender: "bot",
+        text: data?.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't answer."
+      };
+      setChatMessages((prev) => [...prev, botMsg]);
+    } catch {
+      setChatMessages((prev) => [
+        ...prev,
+        { sender: "bot", text: "Error contacting Gemini API." }
+      ]);
+    }
+  }
+
+  useEffect(()=>{
+    setChatMessages([]);
+  },[]);
 
   if (!user || !streakData)
     return (
@@ -124,6 +157,65 @@ export default function ProfilePage() {
           </div>
         </section>
       </main>
+
+      {/* Bot Icon */}
+      <div className="fixed bottom-8 right-8 z-50">
+        <button
+          className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full p-4 shadow-lg"
+          onClick={() => setChatOpen((v) => !v)}
+          title="Ask the chatbot"
+        >
+          <Bot size={32} />
+        </button>
+      </div>
+
+      {/* Chat Panel */}
+      {chatOpen && (
+        <div className="fixed bottom-24 right-8 bg-white rounded-xl shadow-2xl w-80 max-h-[60vh] flex flex-col z-50">
+          <div className="p-3 border-b font-bold text-indigo-700 flex items-center gap-2">
+            <Bot size={20} /> Chatbot
+            <button
+              className="ml-auto text-xs text-gray-400 hover:text-red-500"
+              onClick={() => setChatOpen(false)}
+            >
+              ✕
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-3 space-y-2">
+            {chatMessages.map((msg, idx) => (
+              <div
+                key={idx}
+                className={`text-sm p-2 rounded-lg ${msg.sender === "student"
+                  ? "bg-indigo-100 text-right ml-10"
+                  : "bg-gray-100 text-left mr-10"
+                }`}
+              >
+                {msg.text}
+              </div>
+            ))}
+          </div>
+          <form
+            className="flex border-t p-2 gap-2"
+            onSubmit={e => {
+              e.preventDefault();
+              sendMessage();
+            }}
+          >
+            <input
+              className="flex-1 px-2 py-1 rounded border"
+              value={chatInput}
+              onChange={e => setChatInput(e.target.value)}
+              placeholder="Ask me anything..."
+            />
+            <button
+              type="submit"
+              className="bg-indigo-600 text-white px-3 py-1 rounded"
+            >
+              Send
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }

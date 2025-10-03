@@ -5,7 +5,7 @@ const userRoutes = require("./routes/userRoutes");
 const classroomRoutes = require("./routes/Classroom.routes");
 const teacherRoutes = require("./routes/Teacher.routes");
 const studyRoutes = require("./routes/subject.routes");
-
+const geminiroutes = require("./routes/geminiProxy");
 dotenv.config();
 
 const app = express();
@@ -19,6 +19,7 @@ app.use("/users", userRoutes);
 app.use("/classrooms", classroomRoutes);
 app.use("/teachers", teacherRoutes);
 app.use("/study",studyRoutes)
+app.use("/api",geminiroutes);
 
 app.get("/", (req, res) => {
   res.send("API is running...");

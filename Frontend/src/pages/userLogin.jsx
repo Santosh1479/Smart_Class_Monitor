@@ -7,7 +7,7 @@ export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [email, setEmail] = useState("test3@test.com");
+  const [email, setEmail] = useState("test@test.com");
   const [password, setPassword] = useState("testpass");
 
   const handleLogin = async (e) => {
