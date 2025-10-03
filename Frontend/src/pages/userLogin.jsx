@@ -7,8 +7,8 @@ export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [email, setEmail] = useState("test@test.com");
-  const [password, setPassword] = useState("testpass");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -30,8 +30,7 @@ export default function Login() {
         localStorage.setItem("userId", user._id);
         localStorage.setItem("name", user.name);
         localStorage.setItem("role", "user");
-        localStorage.setItem("branch", user.branch );
-        localStorage.setItem("semester", user.semester);
+        localStorage.setItem("usn", user.usn); // <-- Add this line
 
         // Redirect based on role
         if (user.role === "teacher") {

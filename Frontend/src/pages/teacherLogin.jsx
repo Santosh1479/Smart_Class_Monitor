@@ -7,8 +7,8 @@ export default function TeacherLogin() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [email, setEmail] = useState("test@teac.com");
-  const [password, setPassword] = useState("testpass");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();

@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../context/AuthContext";
 
 export default function UserSignup() {
   const navigate = useNavigate();
-  const [name, setName] = useState("test");
-  const [usn, setUsn] = useState("EC45");
-  const [email, setEmail] = useState("test@test.com");
-  const [password, setPassword] = useState("testpass");
+  const { login } = useAuth();
+  const [name, setName] = useState("");
+  const [usn, setUsn] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -26,6 +28,9 @@ export default function UserSignup() {
       localStorage.setItem("name", res.data.user.name);
       localStorage.setItem("role", "student");
       localStorage.setItem("usn", usn);
+
+      login(res.data.user, res.data.token);
+
       navigate("/profile");
     } catch (err) {
       alert(err.response?.data?.message || "Registration failed");

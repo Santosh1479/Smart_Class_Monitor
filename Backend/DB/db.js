@@ -5,7 +5,7 @@ dotenv.config(); // Load environment variables from .env file
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(`${process.env.MONGO_URI}/CBC`, {
+    const conn = await mongoose.connect(`${process.env.MONGO_URI}/Smart_Class_Monitor`, {
     });
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {

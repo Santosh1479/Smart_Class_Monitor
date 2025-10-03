@@ -3,10 +3,12 @@ import { useAuth } from "../context/AuthContext";
 import Sidebar from "../components/Sidebar";
 import { Bot } from "lucide-react"; // Add this import
 import gsap from "gsap";
+import axios from "axios";
 
 export default function ProfilePage() {
   const { user } = useAuth();
   const [streakData, setStreakData] = useState(null);
+  const [attendanceData, setAttendanceData] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState("");
@@ -15,24 +17,54 @@ export default function ProfilePage() {
   const streakRef = useRef(null);
 
   useEffect(() => {
-    const fetchStreakData = async () => {
-      const data = {
-        currentStreak: 5,
-        bestStreak: 12,
-        lastMissed: "2025-05-08",
-        streakHistory: [
-          { date: "2025-05-05", attended: true },
-          { date: "2025-05-06", attended: true },
-          { date: "2025-05-07", attended: true },
-          { date: "2025-05-08", attended: false },
-          { date: "2025-05-09", attended: true },
-          { date: "2025-05-10", attended: true },
-          { date: "2025-05-11", attended: true },
-        ],
-      };
-      setStreakData(data);
-    };
-    fetchStreakData();
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    async function fetchProfile() {
+      try {
+        const res = await axios.get(
+          `${import.meta.env.VITE_BASE_URL}/users/data`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        const userData = res.data.user;
+        if (!userData) return;
+
+        setAttendanceData(userData.attendance || {});
+        // Streak calculation
+        const attendance = userData.attendance || {};
+        const allAttendance = Object.values(attendance).flat();
+        let currentStreak = 0, bestStreak = 0, lastMissed = null;
+        let streakHistory = [];
+        let streak = 0;
+        for (let i = allAttendance.length - 1; i >= 0; i--) {
+          if (allAttendance[i] === "p") {
+            streak++;
+            if (i === allAttendance.length - 1) currentStreak = streak;
+          } else {
+            if (!lastMissed) lastMissed = `Missed at #${i + 1}`;
+            if (streak > bestStreak) bestStreak = streak;
+            streak = 0;
+          }
+          streakHistory.unshift({
+            date: `Day ${i + 1}`,
+            attended: allAttendance[i] === "p"
+          });
+        }
+        if (streak > bestStreak) bestStreak = streak;
+        setStreakData({
+          currentStreak,
+          bestStreak,
+          lastMissed: lastMissed || "Never missed",
+          streakHistory: streakHistory.slice(-7)
+        });
+      } catch (err) {
+        setAttendanceData({});
+        setStreakData(null);
+        console.error("Profile fetch error:", err);
+      }
+    }
+
+    fetchProfile();
   }, []);
 
   useEffect(() => {
@@ -82,7 +114,9 @@ export default function ProfilePage() {
     setChatMessages([]);
   },[]);
 
-  if (!user || !streakData)
+  if (!attendanceData) return <div>Loading your profile...</div>;
+
+  if (!user || !streakData || !attendanceData)
     return (
       <div className="flex justify-center items-center h-screen bg-gradient-to-br from-indigo-100 to-blue-50">
         <div className="text-center text-lg text-gray-500 animate-pulse">Loading profile...</div>
@@ -155,6 +189,30 @@ export default function ProfilePage() {
               ))}
             </div>
           </div>
+        </section>
+        <section className="w-full max-w-xl bg-white rounded-3xl shadow-xl p-6 md:p-10 mt-6">
+          <h3 className="text-xl md:text-2xl font-bold mb-6 text-gray-700">Attendance (Last 30 Days)</h3>
+          {Object.entries(attendanceData).map(([subject, records]) => {
+            const last30 = records.slice(-30);
+            const presentCount = last30.filter((x) => x === "p").length;
+            return (
+              <div key={subject} className="mb-6">
+                <div className="font-semibold mb-1">{subject}</div>
+                <div className="w-full bg-gray-300 rounded h-6 relative">
+                  <div
+                    className="bg-green-500 h-6 rounded"
+                    style={{
+                      width: `${(presentCount / 30) * 100}%`,
+                      transition: "width 0.5s"
+                    }}
+                  />
+                  <span className="absolute left-2 top-1 text-sm text-white font-bold">
+                    {presentCount} / 30 days
+                  </span>
+                </div>
+              </div>
+            );
+          })}
         </section>
       </main>
 

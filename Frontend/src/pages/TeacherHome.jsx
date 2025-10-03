@@ -6,7 +6,7 @@ import { MoreVertical } from "lucide-react"; // or use any icon
 export default function TeacherHome() {
   const navigate = useNavigate();
   const name = localStorage.getItem("name");
-  const teacherId = localStorage.getItem("userId");
+  const teacherId = localStorage.getItem("id");
   const [classrooms, setClassrooms] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [newClassroom, setNewClassroom] = useState({ name: "", subject: "" });

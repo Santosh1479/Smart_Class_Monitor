@@ -1,21 +1,27 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../context/AuthContext";
 
 export default function TeacherSignup() {
   const navigate = useNavigate();
-  const [name, setName] = useState("test");
-  const [email, setEmail] = useState("test@teac.com");
-  const [password, setPassword] = useState("testpass");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { login } = useAuth();
 
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/teachers/register`, { name, email, password });
+      const res = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/teachers/register`,
+        { name, email, password }
+      );
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("id", res.data.teacher._id);
       localStorage.setItem("name", res.data.teacher.name);
       localStorage.setItem("role", "teacher");
+      login(); // <-- Add this line!
       navigate("/teacher-home");
     } catch (err) {
       console.err(err.response?.data?.message || "Signup failed");

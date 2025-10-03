@@ -70,7 +70,8 @@ module.exports.loginuser = async (req, res) => {
 
 module.exports.getUserData = async (req, res) => {
     try {
-        const user = req.user; // Assuming `authUser` middleware attaches the user to `req`
+        console.log("getUserData: req.user =", req.user); // Debug log
+        const user = req.user;
         res.status(200).json({ user });
     } catch (error) {
         res.status(500).json({ message: "Failed to fetch user data" });
