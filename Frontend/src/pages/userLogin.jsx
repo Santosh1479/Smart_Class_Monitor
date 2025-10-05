@@ -30,7 +30,6 @@ export default function Login() {
         localStorage.setItem("userId", user._id);
         localStorage.setItem("name", user.name);
         localStorage.setItem("role", "user");
-        localStorage.setItem("usn", user.usn); // <-- Add this line
 
         // Redirect based on role
         if (user.role === "teacher") {

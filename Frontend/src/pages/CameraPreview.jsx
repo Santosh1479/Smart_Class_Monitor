@@ -10,8 +10,19 @@ export default function CameraPreview() {
   const [studentCredits, setStudentCredits] = React.useState({});
   const [presentStudents, setPresentStudents] = React.useState([]);
   const [allStudents, setAllStudents] = useState([]);
+  const [devices, setDevices] = useState([]);
+  const [selectedDeviceId, setSelectedDeviceId] = useState("");
   const { className, _id } = useParams();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // List available video input devices
+    navigator.mediaDevices.enumerateDevices().then(deviceInfos => {
+      const cams = deviceInfos.filter(d => d.kind === "videoinput");
+      setDevices(cams);
+      if (cams.length > 0) setSelectedDeviceId(cams[0].deviceId);
+    });
+  }, []);
 
   useEffect(() => {
     let stream;
@@ -22,7 +33,12 @@ export default function CameraPreview() {
         const res = await axios.get(`${import.meta.env.VITE_PY_API_URL}/class/${className}`);
         setAllStudents(res.data.students || []);
 
-        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        if (!selectedDeviceId) return;
+
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { deviceId: { exact: selectedDeviceId } },
+          audio: false
+        });
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
@@ -68,7 +84,7 @@ export default function CameraPreview() {
       if (stream) stream.getTracks().forEach(track => track.stop());
       if (intervalId) clearInterval(intervalId);
     };
-  }, [className, _id]);
+  }, [className, _id, selectedDeviceId]);
 
   useEffect(() => {
     if (recentPredictions.length === 1) {
@@ -155,6 +171,20 @@ export default function CameraPreview() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", height: "100vh", background: "#111" }}>
+      <div style={{ marginBottom: "1rem" }}>
+        <label style={{ color: "#fff", fontWeight: "bold", marginRight: "1rem" }}>Select Camera:</label>
+        <select
+          value={selectedDeviceId}
+          onChange={e => setSelectedDeviceId(e.target.value)}
+          style={{ padding: "0.5rem", borderRadius: "8px" }}
+        >
+          {devices.map(device => (
+            <option key={device.deviceId} value={device.deviceId}>
+              {device.label || `Camera ${device.deviceId}`}
+            </option>
+          ))}
+        </select>
+      </div>
       <video
         ref={videoRef}
         autoPlay

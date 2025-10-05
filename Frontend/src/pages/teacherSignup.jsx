@@ -21,7 +21,6 @@ export default function TeacherSignup() {
       localStorage.setItem("id", res.data.teacher._id);
       localStorage.setItem("name", res.data.teacher.name);
       localStorage.setItem("role", "teacher");
-      login(); // <-- Add this line!
       navigate("/teacher-home");
     } catch (err) {
       console.err(err.response?.data?.message || "Signup failed");

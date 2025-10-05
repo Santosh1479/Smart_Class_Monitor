@@ -11,7 +11,9 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # --- Globals ---
-MODEL_DIR = "C:\\Users\\Santosh\\OneDrive\\Desktop\\Smart_Class_Monitor\\Py_Recognizer\\models"
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_DIR = os.path.join(BASE_DIR, "models")
 loaded_model = None
 current_class = None
 ear_counter = {}  # dict to track EAR per face
@@ -57,13 +59,11 @@ def gaze_status(landmarks, left_eye_indices, right_eye_indices):
         return "Looking Forward"
 
 # --- Load model for class ---
-import os
-
 @app.route("/class/<class_name>", methods=["GET"])
 def load_class_model(class_name):
     global loaded_model, current_class
-    model_path = f"{MODEL_DIR}/{class_name}_model.pkl"
-    dataset_path = os.path.join(os.path.dirname(__file__), "dataset", class_name)
+    model_path = os.path.join(MODEL_DIR, f"{class_name}_model.pkl")
+    dataset_path = os.path.join(BASE_DIR, "dataset", class_name)
     try:
         with open(model_path, "rb") as f:
             loaded_model = pickle.load(f)
@@ -81,7 +81,7 @@ def load_class_model(class_name):
         return jsonify({
             "status": "success",
             "message": f"Loaded model for {class_name}",
-            "students": students  # <-- Add this!
+            "students": students
         })
     except FileNotFoundError:
         return jsonify({"error": f"Model for class '{class_name}' not found"}), 404

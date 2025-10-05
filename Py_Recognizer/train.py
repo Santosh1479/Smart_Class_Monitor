@@ -4,8 +4,9 @@ import face_recognition
 import cv2
 from sklearn.svm import SVC
 
-dataset_path = "C:\\Users\\Santosh\\OneDrive\\Desktop\\Smart_Class_Monitor\\Py_Recognizer\\dataset"
-model_dir = "C:\\Users\\Santosh\\OneDrive\\Desktop\\Smart_Class_Monitor\\Py_Recognizer\\models"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+dataset_path = os.path.join(BASE_DIR, "dataset")
+model_dir = os.path.join(BASE_DIR, "models")
 os.makedirs(model_dir, exist_ok=True)
 
 def train_class(class_name):

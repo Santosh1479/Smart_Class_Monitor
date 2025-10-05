@@ -3,7 +3,8 @@ import os
 import time
 
 def capture_images(class_name, student_name, num_images=50, delay=0.3):
-    folder = f"Py_Recognizer/dataset/{class_name}/{student_name}"
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    folder = os.path.join(BASE_DIR, "dataset", class_name, student_name)
     os.makedirs(folder, exist_ok=True)
 
     cap = cv2.VideoCapture(0)
