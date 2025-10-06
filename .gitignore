@@ -1,4 +1,3 @@
 node_modules
 Py_Recognizer/dataset
 Py_Recognizer/models
-!Frontend/.env
