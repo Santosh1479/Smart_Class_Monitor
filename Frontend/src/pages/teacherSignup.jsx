@@ -5,9 +5,9 @@ import { useAuth } from "../context/AuthContext";
 
 export default function TeacherSignup() {
   const navigate = useNavigate();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [name, setName] = useState("test1");
+  const [email, setEmail] = useState("test1@test.com");
+  const [password, setPassword] = useState("testpass");
   const { login } = useAuth();
 
   const handleSignup = async (e) => {
@@ -22,6 +22,7 @@ export default function TeacherSignup() {
       localStorage.setItem("name", res.data.teacher.name);
       localStorage.setItem("role", "teacher");
       navigate("/teacher-home");
+      login();
     } catch (err) {
       console.err(err.response?.data?.message || "Signup failed");
     }

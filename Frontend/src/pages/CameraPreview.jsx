@@ -16,11 +16,19 @@ export default function CameraPreview() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // List available video input devices
-    navigator.mediaDevices.enumerateDevices().then(deviceInfos => {
-      const cams = deviceInfos.filter(d => d.kind === "videoinput");
-      setDevices(cams);
-      if (cams.length > 0) setSelectedDeviceId(cams[0].deviceId);
+    // Prompt for camera access to get labels
+    navigator.mediaDevices.getUserMedia({ video: true }).then(() => {
+      navigator.mediaDevices.enumerateDevices().then(deviceInfos => {
+        const cams = deviceInfos.filter(d => d.kind === "videoinput");
+        setDevices(cams);
+        // Try to auto-select USB camera if available (label may be empty on first load)
+        const usbCam = cams.find(cam => cam.label && cam.label.toLowerCase().includes("usb"));
+        if (usbCam) {
+          setSelectedDeviceId(usbCam.deviceId);
+        } else if (cams.length > 0) {
+          setSelectedDeviceId(cams[0].deviceId);
+        }
+      });
     });
   }, []);
 
@@ -29,18 +37,19 @@ export default function CameraPreview() {
     let intervalId;
 
     async function init() {
+      if (!selectedDeviceId) {
+        console.log("No camera selected yet.");
+        return;
+      }
       try {
-        const res = await axios.get(`${import.meta.env.VITE_PY_API_URL}/class/${className}`);
-        setAllStudents(res.data.students || []);
-
-        if (!selectedDeviceId) return;
-
+        console.log("Selected deviceId:", selectedDeviceId);
         stream = await navigator.mediaDevices.getUserMedia({
           video: { deviceId: { exact: selectedDeviceId } },
           audio: false
         });
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
+          videoRef.current.play();
         }
 
         intervalId = setInterval(async () => {
@@ -63,7 +72,6 @@ export default function CameraPreview() {
             );
             console.log("Sending image size:", base64?.length, base64 ? "OK" : "NOT OK");
             console.log("Prediction:", res.data);
-
             const faces = res.data.faces || [];
             setRecentPredictions(prev => {
               const next = [...prev, faces];
@@ -74,7 +82,8 @@ export default function CameraPreview() {
           }
         }, 5000);
       } catch (err) {
-        alert("Setup failed: " + err.message);
+        alert("Camera error: " + err.message);
+        console.error("Camera error:", err);
       }
     }
 
@@ -120,6 +129,26 @@ export default function CameraPreview() {
       });
     }
   }, [recentPredictions]);
+
+  useEffect(() => {
+    async function fetchModelAndStudents() {
+      if (!className) return;
+      try {
+        const res = await axios.get(`${import.meta.env.VITE_PY_API_URL}/class/${className}`);
+        if (res.data.status === "success") {
+          setAllStudents(res.data.students || []);
+          console.log("Model loaded for class:", className, "Students:", res.data.students);
+        } else {
+          alert(res.data.error || "Failed to load model");
+          setAllStudents([]);
+        }
+      } catch (err) {
+        alert("Failed to load model: " + (err.response?.data?.error || err.message));
+        setAllStudents([]);
+      }
+    }
+    fetchModelAndStudents();
+  }, [className]);
 
   function exportCredits() {
     const data = presentStudents.map(id => ({
