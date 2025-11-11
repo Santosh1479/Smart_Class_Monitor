@@ -1,56 +1,124 @@
-import React, { useState, useEffect } from 'react';
-import Sidebar from '../components/Sidebar';
-import { Menu } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+
+const COLORS = ["#22c55e", "#f87171", "#facc15"]; // Present-Green, Absent-Red, Holiday-Yellow
 
 const FocusDetection = () => {
-  const [focusLevel, setFocusLevel] = useState(100);
-  const [isOpen, setIsOpen] = useState(false);
+  const [attendance, setAttendance] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const randomFocus = Math.floor(Math.random() * 70) + 30;
-      setFocusLevel(randomFocus);
-    }, 10000);
-    return () => clearInterval(interval);
+    async function fetchAttendance() {
+      try {
+        const res = await fetch("http://localhost:3000/users/profile");
+        const data = await res.json();
+
+        if (res.ok && data.users?.length > 0) {
+          const user = data.users[0];
+          setAttendance(user.attendance || {});
+        } else {
+          setError(data.error || "No attendance data found.");
+        }
+      } catch (err) {
+        setError("Network or server error.");
+      }
+      setLoading(false);
+    }
+    fetchAttendance();
   }, []);
 
-  const getColor = () => {
-    if (focusLevel >= 80) return 'bg-green-500';
-    if (focusLevel >= 50) return 'bg-yellow-400';
-    return 'bg-red-500';
+  if (loading) return <div>⏳ Loading attendance data...</div>;
+  if (error) return <div className="text-red-500">{error}</div>;
+
+  const renderGraph = (subject, records) => {
+    if (!records || records.length === 0) return null;
+
+    const presentCount = records.filter((r) => r === "p").length;
+    const absentCount = records.filter((r) => r === "a").length;
+    const holidayCount = records.filter((r) => r === "h").length;
+    const total = presentCount + absentCount + holidayCount;
+    const percentage =
+      total > 0 ? ((presentCount / total) * 100).toFixed(1) : 0;
+
+    const data = [
+      { name: "Present", value: presentCount },
+      { name: "Absent", value: absentCount },
+      { name: "Holiday", value: holidayCount },
+    ];
+
+    return (
+      <div
+        key={subject}
+        className="bg-white rounded-3xl shadow-md p-5 mb-6 border border-gray-100 flex flex-col items-center"
+      >
+        <h2 className="text-xl font-bold mb-4">{subject}</h2>
+        <div style={{ position: "relative", width: 200, height: 200 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={data}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={90}
+                startAngle={90}
+                endAngle={-270} // to make it clockwise
+                paddingAngle={2}
+              >
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index]} />
+                ))}
+              </Pie>
+              <Tooltip
+                formatter={(value, name) => [value, name]}
+                separator=": "
+              />
+            </PieChart>
+          </ResponsiveContainer>
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              fontSize: "1.5rem",
+              fontWeight: "bold",
+              color: "#22c55e",
+            }}
+          >
+            {percentage}%
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
-      <div className="flex flex-col ">
-        {/* Header Row */}
-        <div className="w-full flex items-center justify-between mb-6 mt-2">
-          <h2 className="text-2xl sm:text-3xl font-bold text-indigo-600">🧠 Real-Time Focus Monitor</h2>
-          <button
-            className="p-2 rounded-md bg-indigo-600 text-white sm:hidden"
-            onClick={() => setIsOpen(true)}
-            aria-label="Open menu"
-          >
-            <Menu className="w-7 h-7" />
-          </button>
+    <div className="p-8 bg-gray-50 min-h-screen">
+      <h1 className="text-3xl font-bold text-center text-blue-800 mb-8">
+        🎯 Attendance Overview
+      </h1>
+
+      {Object.keys(attendance).length === 0 ? (
+        <div className="text-center text-gray-500">
+          No subjects found for this student.
         </div>
-        <div className="p-6 sm:p-8 bg-white rounded-2xl shadow-xl w-full max-w-lg text-center">
-          <p className="text-gray-700 mb-2">Estimated Focus Level:</p>
-          <div className="w-full h-6 bg-gray-200 rounded-full overflow-hidden mb-3">
-            <div
-              className={`h-full ${getColor()}`}
-              style={{ width: `${focusLevel}%`, transition: 'width 0.5s ease-in-out' }}
-            ></div>
-          </div>
-          <p className="text-2xl font-bold text-gray-800">{focusLevel}%</p>
-          {focusLevel < 50 && (
-            <div className="mt-5 p-4 bg-red-100 text-red-700 border border-red-400 rounded-md text-sm">
-              🚨 You seem distracted! Take a short break or refocus on your class.
-            </div>
+      ) : (
+        <div className="grid md:grid-cols-2 gap-6 justify-items-center">
+          {Object.entries(attendance).map(([subject, records]) =>
+            renderGraph(subject, records)
           )}
         </div>
-      </div>
+      )}
     </div>
   );
 };

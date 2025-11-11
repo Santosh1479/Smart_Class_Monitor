@@ -13,24 +13,49 @@ router.get('/data', authUser, userController.getUserData);
 
 // Example route for user registration
 router.post(
-    '/register',
-    [
-        body('name').notEmpty().withMessage('Name is required'),
-        body('email').isEmail().withMessage('Invalid email'),
-        body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-    ],
-    userController.registerUser
+  '/register',
+  [
+    body('name').notEmpty().withMessage('Name is required'),
+    body('email').isEmail().withMessage('Invalid email'),
+    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+  ],
+  userController.registerUser
 );
 
 // Example route for user login
 router.post(
-    '/login',
-    [
-        body('email').isEmail().withMessage('Invalid email'),
-        body('password').notEmpty().withMessage('Password is required'),
-    ],
-    userController.loginuser
+  '/login',
+  [
+    body('email').isEmail().withMessage('Invalid email'),
+    body('password').notEmpty().withMessage('Password is required'),
+  ],
+  userController.loginuser
 );
+// Public route for testing - fetch all user attendance data
+router.get("/profile", async (req, res) => {
+  try {
+    // You can change this to find one user later if needed
+    const users = await User.find({}).select("-password");
+
+    if (!users || users.length === 0) {
+      return res.status(404).json({ error: "No users found" });
+    }
+
+    const result = users.map((user) => ({
+      name: user.name,
+      email: user.email,
+      usn: user.usn,
+      attendance: Object.fromEntries(user.attendance),
+      subjects: Object.keys(Object.fromEntries(user.attendance)),
+    }));
+
+    res.json({ users: result });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 const upload = multer();
 
@@ -109,5 +134,50 @@ router.post("/attendance-absent", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// Get subject-wise attendance analytics
+router.get("/attendance-trend/:subject", async (req, res) => {
+  try {
+    const subject = req.params.subject;
+    const users = await User.find({});
+
+    if (!users || users.length === 0) {
+      return res.status(404).json({ error: "No users found" });
+    }
+
+    let analytics = [];
+
+    users.forEach((user) => {
+      if (user.attendance.has(subject)) {
+        const records = user.attendance.get(subject);
+        const totalClasses = records.length;
+        const presentCount = records.filter((x) => x === "p").length;
+        const absentCount = records.filter((x) => x === "a").length;
+        const holidayCount = records.filter((x) => x === "h").length;
+
+        const percentage =
+          totalClasses > 0 ? ((presentCount / totalClasses) * 100).toFixed(2) : 0;
+
+        analytics.push({
+          name: user.name,
+          usn: user.usn,
+          totalClasses,
+          presentCount,
+          absentCount,
+          holidayCount,
+          attendancePercentage: percentage,
+        });
+      }
+    });
+
+    // Optional: sort by attendance %
+    analytics.sort((a, b) => b.attendancePercentage - a.attendancePercentage);
+
+    res.json({ subject, analytics });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 module.exports = router;

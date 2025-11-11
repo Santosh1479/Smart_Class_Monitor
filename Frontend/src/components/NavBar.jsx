@@ -43,8 +43,8 @@ export default function Navbar() {
           ) : user?.role === "student" ? (
             <>
               <Link to="/profile" className="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-full text-white">Profile</Link>
-              <Link to="/analytics" className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 rounded-full text-white">Analytics</Link>
-              <Link to="/focus" className="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-full text-white">Focus</Link>
+              <Link to="student/focus" className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 rounded-full text-white">Analytics</Link>
+              <Link to="/analytics" className="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-full text-white">Focus</Link>
               <button
                 onClick={handleLogout}
                 className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-full text-white"
@@ -117,7 +117,7 @@ export default function Navbar() {
                       Analytics
                     </Link>
                     <Link
-                      to="/focus"
+                      to="/student/focus"
                       className="px-4 py-2 text-black size-2 mb-4"
                       onClick={() => setIsOpen(false)}
                     >

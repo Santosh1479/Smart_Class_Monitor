@@ -1,3 +1,18 @@
 node_modules
 Py_Recognizer/dataset
 Py_Recognizer/models
+# Node
+node_modules/
+npm-debug.log
+
+# Env
+.env
+
+# Docker
+*.log
+*.env
+.DS_Store
+
+# Build output
+dist/
+build/

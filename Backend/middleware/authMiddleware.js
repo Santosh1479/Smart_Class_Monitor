@@ -1,7 +1,7 @@
 const userModel = require('../models/User.model');
 const teacherModel = require('../models/Teacher.model');
 const jwt = require('jsonwebtoken');
-const blackListTokenModel = require('../models/blackListToken.model');
+const blackListTokenModel = require('../models/blacklistToken.model');
 
 // Middleware to authenticate users
 module.exports.authUser = async (req, res, next) => {

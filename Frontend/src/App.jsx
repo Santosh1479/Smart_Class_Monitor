@@ -10,6 +10,7 @@ import UserHome from "./pages/home";
 import Navbar from "./components/NavBar";
 import StudentProfile from "./pages/StudentProfile";
 import FocusDetection from './pages/FocusDetection';
+import Analytics from "./pages/Analytics";
 import CameraPreview from "./pages/CameraPreview";
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
         <Route path="/user-home" element={<UserHome />} />
         <Route path="/profile" element={<StudentProfile />} />
         <Route path="/student/focus" element={<FocusDetection />} />
+        <Route path="/analytics" element={<Analytics />} />
         <Route path="/camera-preview/:classroomId" element={<CameraPreview />} />
         <Route path="/camera-preview/:className/:_id" element={<CameraPreview />} />
       </Routes>
