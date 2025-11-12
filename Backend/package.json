@@ -5,10 +5,11 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint":"eslint . --ext .js,.jsx,.ts,.tsx",
-    "lint-fix" : "eslint . --ext .js,.jsx,.ts,.tsx --fix",
-    "format" : "prettier --write .",
-    "start": "node server.js"
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint-fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "format": "prettier --write .",
+    "start": "node server.js",
+    "build": "echo \"No build step for backend\""
   },
   "keywords": [],
   "author": "",
