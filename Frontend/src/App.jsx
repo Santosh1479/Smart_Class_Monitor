@@ -14,6 +14,7 @@ import Analytics from './pages/Analytics';
 import CameraPreview from './pages/CameraPreview';
 
 function App() {
+  let feature = 'f';
   return (
     <Router>
       <Navbar />
