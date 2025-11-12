@@ -85,4 +85,4 @@ module.exports.logoutUser = async (req, res, next) => {
     await blacklistTokenModel.create({ token });
 
     res.status(200).json({ message: "logged out" });
-}
+};

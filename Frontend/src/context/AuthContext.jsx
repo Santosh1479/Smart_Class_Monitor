@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from 'react';
 
 const AuthContext = createContext();
 
@@ -7,10 +7,10 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
-    const name = localStorage.getItem("name");
-    const id = localStorage.getItem("userId") || localStorage.getItem("id");
+    const storedToken = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+    const name = localStorage.getItem('name');
+    const id = localStorage.getItem('userId') || localStorage.getItem('id');
 
     if (storedToken && role && name && id) {
       setUser({ _id: id, name, role });
@@ -18,12 +18,12 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const login = (userData) => {
-    const role = localStorage.getItem("role");
-    const name = localStorage.getItem("name");
-    const id = localStorage.getItem("userId") || localStorage.getItem("id");
+  const login = () => {
+    const role = localStorage.getItem('role');
+    const name = localStorage.getItem('name');
+    const id = localStorage.getItem('userId') || localStorage.getItem('id');
     setUser({ _id: id, name, role });
-    setToken(localStorage.getItem("token"));
+    setToken(localStorage.getItem('token'));
   };
 
   const logout = () => {

@@ -1,4 +1,4 @@
-const Classroom = require("./models/Classroom.model")
+const Classroom = require("./models/Classroom.model");
 const joinTimes = {};
 
 

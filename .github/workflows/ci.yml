@@ -1,0 +1,46 @@
+name: build-add-lint
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install Backend dependencies
+        working-directory: ./Backend
+        run: npm install
+
+      - name: Lint Backend code
+        working-directory: ./Backend
+        run: npm run lint
+
+      - name: Install Frontend dependencies
+        working-directory: ./Frontend
+        run: npm install
+
+      - name: Lint Frontend code
+        working-directory: ./Frontend
+        run: npm run lint
+
+      - name: Build Backend
+        working-directory: ./Backend
+        run: npm run build
+
+      - name: Build Frontend
+        working-directory: ./Frontend
+        run: npm run build

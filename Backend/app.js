@@ -18,8 +18,13 @@ app.use(express.json());
 app.use("/users", userRoutes);
 app.use("/classrooms", classroomRoutes);
 app.use("/teachers", teacherRoutes);
-app.use("/study",studyRoutes)
-app.use("/api",geminiroutes);
+app.use("/study", studyRoutes);
+app.use("/api", geminiroutes);
+
+app.use((err, req, res, next) => {
+  console.error(err.stack, next);
+  res.status(500).send("Something broke!");
+});
 
 app.get("/", (req, res) => {
   res.send("API is running...");

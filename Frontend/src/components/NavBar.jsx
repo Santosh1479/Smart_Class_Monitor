@@ -1,6 +1,6 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -33,18 +33,33 @@ export default function Navbar() {
             >
               Login
             </Link>
-          ) : user?.role === "teacher" ? (
+          ) : user?.role === 'teacher' ? (
             <button
               onClick={handleLogout}
               className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-full text-white"
             >
               Logout
             </button>
-          ) : user?.role === "student" ? (
+          ) : user?.role === 'student' ? (
             <>
-              <Link to="/profile" className="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-full text-white">Profile</Link>
-              <Link to="student/focus" className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 rounded-full text-white">Analytics</Link>
-              <Link to="/analytics" className="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-full text-white">Focus</Link>
+              <Link
+                to="/profile"
+                className="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-full text-white"
+              >
+                Profile
+              </Link>
+              <Link
+                to="student/focus"
+                className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 rounded-full text-white"
+              >
+                Analytics
+              </Link>
+              <Link
+                to="/analytics"
+                className="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-full text-white"
+              >
+                Focus
+              </Link>
               <button
                 onClick={handleLogout}
                 className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-full text-white"
@@ -56,7 +71,7 @@ export default function Navbar() {
             <>
               <Link to="/profile">
                 <img
-                  src={user?.profileImage || "/default-profile-icon.png"}
+                  src={user?.profileImage || '/default-profile-icon.png'}
                   alt="Profile"
                   className="w-8 h-8 rounded-full border-2 border-white hover:opacity-80 transition"
                 />
@@ -92,14 +107,13 @@ export default function Navbar() {
                   >
                     Login
                   </Link>
-                ) : user?.role === "teacher" ? (
+                ) : user?.role === 'teacher' ? (
                   <button
                     onClick={handleLogout}
                     className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-full text-white mb-4"
                   >
                     Logout
                   </button>
-                
                 ) : (
                   <div className="flex flex-col gap-2">
                     <Link
