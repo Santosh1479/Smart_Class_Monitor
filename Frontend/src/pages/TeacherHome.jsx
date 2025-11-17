@@ -1,28 +1,28 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { MoreVertical } from "lucide-react"; // or use any icon
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { MoreVertical } from 'lucide-react'; // or use any icon
 
 export default function TeacherHome() {
   const navigate = useNavigate();
-  const name = localStorage.getItem("name");
-  const teacherId = localStorage.getItem("id");
+  const name = localStorage.getItem('name');
+  const teacherId = localStorage.getItem('userId');
   const [classrooms, setClassrooms] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [newClassroom, setNewClassroom] = useState({ name: "", subject: "" });
+  const [newClassroom, setNewClassroom] = useState({ name: '', subject: '' });
   const [menuOpen, setMenuOpen] = useState(null);
-  const [toast, setToast] = useState("");
+  const [toast, setToast] = useState('');
 
   // Fetch classrooms created by the teacher
   useEffect(() => {
     const fetchClassrooms = async () => {
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_BASE_URL}/classrooms/teacher/${teacherId}`
+          `${import.meta.env.VITE_BASE_URL}/classrooms/teacher/${teacherId}`,
         );
         setClassrooms(res.data);
       } catch (err) {
-        console.error("Error fetching classrooms:", err);
+        console.error('Error fetching classrooms:', err);
       }
     };
 
@@ -32,25 +32,25 @@ export default function TeacherHome() {
   const handleCreateClassroom = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/classrooms/create`,
-        { ...newClassroom, teacherId }
-      );
+      const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/classrooms/create`, {
+        ...newClassroom,
+        teacherId,
+      });
       setClassrooms([...classrooms, res.data]);
-      setNewClassroom({ name: "", subject: "" });
+      setNewClassroom({ name: '', subject: '' });
       setShowForm(false);
     } catch (err) {
-      console.error("Error creating classroom:", err);
-      console.err(err.response?.data?.message || "Failed to create classroom");
+      console.error('Error creating classroom:', err);
+      console.err(err.response?.data?.message || 'Failed to create classroom');
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("id");
-    localStorage.removeItem("name");
-    localStorage.removeItem("role");
-    navigate("/teacher-login");
+    localStorage.removeItem('token');
+    localStorage.removeItem('id');
+    localStorage.removeItem('name');
+    localStorage.removeItem('role');
+    navigate('/teacher-login');
   };
 
   return (
@@ -90,9 +90,7 @@ export default function TeacherHome() {
                 type="text"
                 placeholder="Classroom Name"
                 value={newClassroom.name}
-                onChange={(e) =>
-                  setNewClassroom({ ...newClassroom, name: e.target.value })
-                }
+                onChange={(e) => setNewClassroom({ ...newClassroom, name: e.target.value })}
                 className="w-full px-4 py-2 bg-white/20 border border-white/30 rounded-lg placeholder-gray-200 text-white focus:outline-none focus:ring-2 focus:ring-violet-400"
                 required
               />
@@ -100,9 +98,7 @@ export default function TeacherHome() {
                 type="text"
                 placeholder="Subject"
                 value={newClassroom.subject}
-                onChange={(e) =>
-                  setNewClassroom({ ...newClassroom, subject: e.target.value })
-                }
+                onChange={(e) => setNewClassroom({ ...newClassroom, subject: e.target.value })}
                 className="w-full px-4 py-2 bg-white/20 border border-white/30 rounded-lg placeholder-gray-200 text-white focus:outline-none focus:ring-2 focus:ring-violet-400"
                 required
               />
@@ -127,19 +123,13 @@ export default function TeacherHome() {
 
         {/* Display Classrooms Section */}
         <div className="w-full max-w-4xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-md rounded-2xl p-6">
-          <h2 className="text-xl font-bold mb-4 drop-shadow-lg">
-            Your Created Classrooms
-          </h2>
+          <h2 className="text-xl font-bold mb-4 drop-shadow-lg">Your Created Classrooms</h2>
           {classrooms.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {classrooms.map((classroom) => (
                 <div
                   key={classroom._id}
-                  onClick={() =>
-                    navigate(
-                      `/camera-preview/${classroom.name}/${classroom._id}`
-                    )
-                  }
+                  onClick={() => navigate(`/camera-preview/${classroom.name}/${classroom._id}`)}
                   className="cursor-pointer p-4 bg-gray-100 rounded-lg shadow-md relative"
                 >
                   <div className="relative">
@@ -163,24 +153,20 @@ export default function TeacherHome() {
                             e.stopPropagation();
                             // 1. Get all students of this class
                             const res = await axios.get(
-                              `${import.meta.env.VITE_PY_API_URL}/class/${
-                                classroom.name
-                              }`
+                              `${import.meta.env.VITE_PY_API_URL}/class/${classroom.name}`,
                             );
                             const students = res.data.students || [];
                             // 2. Hit holiday API
                             await axios.post(
-                              `${
-                                import.meta.env.VITE_BASE_URL
-                              }/users/attendance-holiday`,
+                              `${import.meta.env.VITE_BASE_URL}/users/attendance-holiday`,
                               {
                                 subject: classroom.name,
                                 students,
-                              }
+                              },
                             );
                             setMenuOpen(null);
-                            setToast("Marked holiday for today");
-                            setTimeout(() => setToast(""), 2000);
+                            setToast('Marked holiday for today');
+                            setTimeout(() => setToast(''), 2000);
                           }}
                         >
                           Put Holiday
@@ -188,12 +174,8 @@ export default function TeacherHome() {
                       </div>
                     )}
                   </div>
-                  <h3 className="text-lg font-bold text-black">
-                    {classroom.name}
-                  </h3>
-                  <p className="text-sm text-gray-900">
-                    Subject: {classroom.subject}
-                  </p>
+                  <h3 className="text-lg font-bold text-black">{classroom.name}</h3>
+                  <p className="text-sm text-gray-900">Subject: {classroom.subject}</p>
                 </div>
               ))}
             </div>
