@@ -3,7 +3,7 @@ import random
 from datetime import datetime, timedelta
 
 BASE_URL = "http://localhost:3000/users/attendance-upload"
-SUBJECT = "HTML"
+SUBJECT = "HTML,CSS,JS,NODE,REACT,MERN,PYTHON"
 
 students = [
     "1AB23CS001", "1AB23CS002", "1AB23CS003", "1AB23CS004", "1AB23CS005",
@@ -22,7 +22,7 @@ for day in range(days):
         attendance_list.append({"USN": usn, "Status": status})
 
     payload = {
-        "subject": SUBJECT,
+        "subject":random.choice(SUBJECT.split(",")),
         "attendance": attendance_list
     }
 

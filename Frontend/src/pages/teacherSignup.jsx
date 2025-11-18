@@ -1,39 +1,38 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
-import { useAuth } from "../context/AuthContext";
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 export default function TeacherSignup() {
   const navigate = useNavigate();
-  const [name, setName] = useState("test1");
-  const [email, setEmail] = useState("test1@test.com");
-  const [password, setPassword] = useState("testpass");
+  const [name, setName] = useState('test1');
+  const [email, setEmail] = useState('test1@test.com');
+  const [password, setPassword] = useState('testpass');
   const { login } = useAuth();
 
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}/teachers/register`,
-        { name, email, password }
-      );
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("id", res.data.teacher._id);
-      localStorage.setItem("name", res.data.teacher.name);
-      localStorage.setItem("role", "teacher");
-      navigate("/teacher-home");
+      const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/teachers/register`, {
+        name,
+        email,
+        password,
+      });
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('userId', res.data.teacher._id);
+      localStorage.setItem('name', res.data.teacher.name);
+      localStorage.setItem('role', 'teacher');
+      navigate('/teacher-home');
       login();
     } catch (err) {
-      console.err(err.response?.data?.message || "Signup failed");
+      console.err(err.response?.data?.message || 'Signup failed');
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1D0036] to-[#6A29FF] flex items-center justify-center text-white px-4">
       <div className="bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl rounded-2xl p-8 w-full max-w-md">
-        <h2 className="text-3xl font-extrabold text-center mb-2 drop-shadow-lg">
-          Teacher Signup
-        </h2>
+        <h2 className="text-3xl font-extrabold text-center mb-2 drop-shadow-lg">Teacher Signup</h2>
         <p className="text-center text-gray-300 mb-6">
           Create your account to manage your classes and students
         </p>
@@ -72,9 +71,9 @@ export default function TeacherSignup() {
         </form>
 
         <div className="mt-4 text-center text-sm text-gray-300">
-          Already have an account?{" "}
+          Already have an account?{' '}
           <button
-            onClick={() => navigate("/teacher-login")}
+            onClick={() => navigate('/teacher-login')}
             className="text-orange-300 hover:underline font-medium"
           >
             Login
@@ -82,10 +81,7 @@ export default function TeacherSignup() {
         </div>
 
         <div className="mt-4 text-center">
-          <Link
-            to="/register"
-            className="inline-block text-white hover:text-indigo-300 transition"
-          >
+          <Link to="/register" className="inline-block text-white hover:text-indigo-300 transition">
             User Signup
           </Link>
         </div>
